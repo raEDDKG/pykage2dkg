@@ -1,22 +1,66 @@
 # extractor/treesitter_extractor.py
-import tree_sitter_python as tspython
-import tree_sitter_javascript as tsjs
-import tree_sitter_typescript as tsts
-from tree_sitter import Language, Parser, Node
+try:
+    import tree_sitter_python as tspython
+    import tree_sitter_javascript as tsjs
+    import tree_sitter_typescript as tsts
+    from tree_sitter import Language, Parser, Node
+    TREE_SITTER_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Tree-sitter not available: {e}")
+    TREE_SITTER_AVAILABLE = False
+
 from typing import Dict, List, Any, Optional
 import os
 
 class TreeSitterExtractor:
     def __init__(self):
-        self.languages = {
-            'python': Language(tspython.language()),
-            'javascript': Language(tsjs.language()),
-            'typescript': Language(tsts.language())
-        }
-        self.parser = Parser()
+        if not TREE_SITTER_AVAILABLE:
+            self.languages = {}
+            self.parser = None
+            return
+            
+        try:
+            self.languages = {
+                'python': Language(tspython.language()),
+            }
+            
+            # Try to add JavaScript support
+            try:
+                self.languages['javascript'] = Language(tsjs.language())
+            except Exception as e:
+                print(f"Warning: JavaScript tree-sitter not available: {e}")
+            
+            # Try to add TypeScript support
+            try:
+                # Different tree-sitter-typescript versions have different APIs
+                if hasattr(tsts, 'language'):
+                    self.languages['typescript'] = Language(tsts.language())
+                elif hasattr(tsts, 'language_typescript'):
+                    self.languages['typescript'] = Language(tsts.language_typescript())
+                else:
+                    print("Warning: TypeScript tree-sitter language function not found")
+            except Exception as e:
+                print(f"Warning: TypeScript tree-sitter not available: {e}")
+                
+            self.parser = Parser()
+        except Exception as e:
+            print(f"Warning: Failed to initialize tree-sitter: {e}")
+            self.languages = {}
+            self.parser = None
     
     def extract_from_file(self, file_path: str) -> Dict[str, Any]:
         """Extract from file based on extension"""
+        if not TREE_SITTER_AVAILABLE or self.parser is None:
+            return {
+                "@type": "CrossLanguageCodeFile",
+                "error": "Tree-sitter not available",
+                "language": "unknown",
+                "functions": [],
+                "classes": [],
+                "imports": [],
+                "exports": []
+            }
+            
         ext = os.path.splitext(file_path)[1].lower()
         lang_map = {
             '.py': 'python',
@@ -37,6 +81,17 @@ class TreeSitterExtractor:
     
     def extract(self, source_code: bytes, language: str = 'python') -> Dict[str, Any]:
         """Extract structure using Tree-sitter"""
+        if not TREE_SITTER_AVAILABLE or self.parser is None:
+            return {
+                "@type": "CrossLanguageCodeFile",
+                "error": "Tree-sitter not available",
+                "language": language,
+                "functions": [],
+                "classes": [],
+                "imports": [],
+                "exports": []
+            }
+            
         if language not in self.languages:
             return {"error": f"Unsupported language: {language}"}
         

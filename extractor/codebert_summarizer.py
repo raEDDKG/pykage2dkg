@@ -1,15 +1,52 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-
-# Use a public summarization model
-MODEL_ID = "Salesforce/codet5-base-multi-sum"
-
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID)
+try:
+    from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+    
+    # Use a public summarization model
+    MODEL_ID = "Salesforce/codet5-base-multi-sum"
+    
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+        model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID)
+        TRANSFORMERS_AVAILABLE = True
+    except Exception as e:
+        print(f"Warning: Could not load transformers model: {e}")
+        TRANSFORMERS_AVAILABLE = False
+        
+except ImportError:
+    print("Warning: transformers not available, using fallback summarizer")
+    TRANSFORMERS_AVAILABLE = False
 
 def summarize_code(code: str) -> str:
     """
     Generate a concise summary of a code snippet.
     """
+    if not TRANSFORMERS_AVAILABLE:
+        # Fallback: simple rule-based summarization
+        lines = code.strip().split('\n')
+        if not lines:
+            return "Empty code"
+        
+        # Extract function/class names and docstrings
+        summary_parts = []
+        for line in lines:
+            line = line.strip()
+            if line.startswith('def ') or line.startswith('async def '):
+                func_name = line.split('(')[0].replace('def ', '').replace('async def ', '')
+                summary_parts.append(f"Function: {func_name}")
+            elif line.startswith('class '):
+                class_name = line.split('(')[0].replace('class ', '').replace(':', '')
+                summary_parts.append(f"Class: {class_name}")
+            elif line.startswith('"""') or line.startswith("'''"):
+                docstring = line.strip('"""').strip("'''").strip()
+                if docstring:
+                    summary_parts.append(docstring)
+        
+        if summary_parts:
+            return "; ".join(summary_parts[:3])  # Limit to first 3 items
+        else:
+            return f"Code snippet ({len(lines)} lines)"
+    
+    # Use transformers if available
     prefix = "summarize: "
     inputs = tokenizer.encode(prefix + code,
                               return_tensors="pt",
