@@ -1,0 +1,101 @@
+{
+    "@context": [
+      "https://schema.org",
+      {
+        "analysis": "https://pykage2dkg.org/analysis#",
+        "security": "https://pykage2dkg.org/security#",
+        "types": "https://pykage2dkg.org/types#"
+      }
+    ],
+    "@type": "SoftwareSourceCode",
+    "name": "emoji",
+    "programmingLanguage": "Python",
+    "hasPart": [
+      {
+        "@type": "CodeModule",
+        "name": "emoji",
+        "hasPart": [
+          {
+            "@type": "CodeFile",
+            "name": "emoji/core.py",
+            "programmingLanguage": "Python",
+            "text": "def emojize(string):\n    \"Replace :coffee: with ☕\"\n    return string.replace(\":coffee:\", \"☕\")",
+            "hasPart": [
+              {
+                "@type": "Function",
+                "name": "emojize",
+                "text": "def emojize(string):\n    \"Replace :coffee: with ☕\"\n    return string.replace(\":coffee:\", \"☕\")",
+                "description": "Replace :coffee: with ☕",
+                "decorators": [],
+                "calls": ["replace"],
+                "isAsync": false,
+                "inClass": null,
+                "summary": "Replaces coffee shortcode with the coffee emoji.",
+                "embedding": [0.1234, -0.5678, /* …768-d vector… */]
+              }
+            ],
+            "enhanced": {
+              "ast": {
+                "classes": [],
+                "functions": [
+                  { /* same as above Function block */ }
+                ]
+              },
+              "libcst": {
+                "functions": [
+                  {
+                    "name": "emojize",
+                    "parameters": [{"name":"string","annotation":null,"default":null}],
+                    "returnType": null,
+                    "typeComments": [],
+                    "isAsync": false,
+                    "decorators": []
+                  }
+                ],
+                "classes": [],
+                "typeAnnotations": {}
+              },
+              "parso": {
+                "functions": [{ "name": "emojize", "startLine":1, "endLine":3, "isPartialParse": false }],
+                "classes": []
+              },
+              "typeAnalysis": {
+                "pyright": { /* diagnostics and summary */ },
+                "mypy": { /* diagnostics and returnCode */ },
+                "summary": { "totalErrors":0, "totalWarnings":0, "toolsUsed":["pyright","mypy"] }
+              },
+              "securityAnalysis": {
+                "bandit": { "vulnerabilities": [], "metrics": {}, "skippedTests": [] },
+                "codeql": { "vulnerabilities": [], "format":"sarif" },
+                "summary": { "totalVulnerabilities":0, "severityBreakdown":{}, "toolsUsed":["bandit","codeql"], "riskLevel":"LOW" }
+              }
+            },
+            "crossLanguage": {
+              "@type": "CrossLanguageCodeFile",
+              "language": "python",
+              "functions": [ /* extracted by Tree-sitter */ ],
+              "classes": [],
+              "imports": [ /* import nodes */ ]
+            },
+            "documentation": {
+              "@type": "DocumentationExtract",
+              "language": "python",
+              "modules": [ /* from Dossier */ ],
+              "apiEndpoints": [],
+              "documentation": { "readme":"...", "changelog":"...", "apiDocs":"" }
+            },
+            "analysisTimestamp": "2025-06-10T04:12:30Z"
+          }
+        ]
+      }
+    ],
+    "analysisMetadata": {
+      "@type": "AnalysisMetadata",
+      "timestamp": "2025-06-10T04:12:30Z",
+      "toolsUsed": ["libcst","parso","type-analysis","security-analysis","tree-sitter"],
+      "securitySummary": { "totalIssues":0,"riskLevel":"LOW" },
+      "typeSummary": { "totalErrors":0,"coverage":"GOOD" },
+      "crossLanguageSupport": true
+    }
+  }
+  

@@ -1,0 +1,22 @@
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "emoji",
+    "programmingLanguage": "Python",
+    "hasPart": [
+      {
+        "@type": "CodeFile",
+        "name": "emoji/core.py",
+        "programmingLanguage": "Python",
+        "text": "def emojize(string):\n    \"Replace :coffee: with ☕\"\n    return string.replace(\":coffee:\", \"☕\")",
+        "hasPart": [
+          {
+            "@type": "Function",
+            "name": "emojize",
+            "text": "def emojize(string):\n    \"Replace :coffee: with ☕\"\n    return string.replace(\":coffee:\", \"☕\")"
+          }
+        ]
+      }
+    ]
+  }
+  
