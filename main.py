@@ -19,7 +19,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("📦 extracting codemeta metadata...")
-    meta = extract_codemeta(args.package_dir)
+    meta = extract_codemeta(args.package_dir, args.name)
 
     print("📁 extracting hierarchy + summaries + embeddings...")
     modules = walk_python_modules(args.package_dir)
