@@ -44,7 +44,27 @@ class RuntimeBehaviorExtractor:
         else:
             self.tracer = None
     
+    # def extract_runtime_behavior(self, package_path: str, test_scripts: List[str] = None) -> Dict[str, Any]:
+    #     """
+    #     Extract runtime behavior using multiple approaches:
+    #     1. noWorkflow for automatic provenance
+    #     2. OpenTelemetry for tracing
+    #     3. Custom execution analysis
+    #     """
+        
+    #     runtime_data = {
+    #         "@type": "RuntimeBehavior",
+    #         "provenance": self.extract_provenance_with_noworkflow(package_path, test_scripts),
+    #         "traces": self.extract_opentelemetry_traces(package_path, test_scripts),
+    #         "executions": self.extract_execution_patterns(package_path, test_scripts),
+    #         "dataFlow": self.extract_runtime_data_flow(package_path, test_scripts)
+    #     }
+        
+    #     return runtime_data
     def extract_runtime_behavior(self, package_path: str, test_scripts: List[str] = None) -> Dict[str, Any]:
+        # remember where the package lives so our test‐generator can compute imports
+        self.package_path = package_path
+
         """
         Extract runtime behavior using multiple approaches:
         1. noWorkflow for automatic provenance
@@ -55,9 +75,9 @@ class RuntimeBehaviorExtractor:
         runtime_data = {
             "@type": "RuntimeBehavior",
             "provenance": self.extract_provenance_with_noworkflow(package_path, test_scripts),
-            "traces": self.extract_opentelemetry_traces(package_path, test_scripts),
+            "traces":     self.extract_opentelemetry_traces(package_path, test_scripts),
             "executions": self.extract_execution_patterns(package_path, test_scripts),
-            "dataFlow": self.extract_runtime_data_flow(package_path, test_scripts)
+            "dataFlow":   self.extract_runtime_data_flow(package_path, test_scripts),
         }
         
         return runtime_data
@@ -259,7 +279,9 @@ with tracer.start_as_current_span("script_execution"):
     def create_simple_test_scripts(self, package_path: str) -> List[str]:
         """Create simple test scripts that exercise the package"""
         
-        test_scripts = []
+        #test_scripts = []
+        self.package_root = os.path.abspath(package_path)
+        test_scripts: List[str] = []
         
         # Find Python files to analyze
         python_files = []
@@ -276,81 +298,167 @@ with tracer.start_as_current_span("script_execution"):
         
         return test_scripts
     
-    def create_test_script_for_module(self, module_path: str) -> Optional[str]:
-        """Create a simple test script for a module"""
+#     def create_test_script_for_module(self, module_path: str) -> Optional[str]:
+#         """Create a simple test script for a module"""
         
+#         try:
+#             # Analyze the module to find classes and functions
+#             with open(module_path, 'r') as f:
+#                 content = f.read()
+            
+#             # Simple extraction of class and function names
+#             import ast
+#             tree = ast.parse(content)
+            
+#             classes = []
+#             functions = []
+            
+#             for node in ast.walk(tree):
+#                 if isinstance(node, ast.ClassDef):
+#                     classes.append(node.name)
+#                 elif isinstance(node, ast.FunctionDef) and not node.name.startswith('_'):
+#                     functions.append(node.name)
+            
+#             # Create test script
+#             module_name = os.path.splitext(os.path.basename(module_path))[0]
+#             test_content = f'''
+# #!/usr/bin/env python3
+# """Auto-generated test script for {module_name}"""
+
+# import sys
+# import os
+# sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# import inspect
+
+# try:
+#     from {module_name} import *
+    
+#     print(f"Testing module: {module_name}")
+    
+#     # Test classes
+# '''
+            
+#             for class_name in classes:
+#                 test_content += f'''
+#     try:
+#         print(f"Testing class: {class_name}")
+#         obj = {class_name}()
+#         print(f"Created {class_name} instance")
+#     except Exception as e:
+#         print(f"Failed to test {class_name}: {{e}}")
+# '''
+            
+# #             for func_name in functions:
+# #                 test_content += f'''
+# #     try:
+# #         print(f"Testing function: {func_name}")
+# #         # Try calling with no args first
+# #         result = {func_name}()
+# #         print(f"{func_name}() returned: {{result}}")
+# #     except Exception as e:
+# #         print(f"Failed to test {func_name}: {{e}}")
+# # '''
+#             # Make sure inspect is available in the test harness
+#             test_content = test_content.replace(
+#                 "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))",
+#                 "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\nimport inspect"
+#             )
+
+#             for func_name in functions:
+#                 test_content += f'''
+#     try:
+#         print(f"Testing function: {func_name}")
+#         sig = inspect.signature({func_name})
+#         # skip any function that has required (non‐default) parameters
+#         if any(p.default is inspect._empty for p in sig.parameters.values()):
+#             print(f"Skipping {func_name}: requires parameters")
+#         else:
+#             result = {func_name}()
+#             print(f"{func_name}() returned: {{result}}")
+#     except Exception as e:
+#         print(f"Failed to test {func_name}: {{e}}")
+# '''
+
+            
+#             test_content += '''
+# except Exception as e:
+#     print(f"Failed to import module: {e}")
+# '''
+            
+#             # Save test script
+#             test_script_path = os.path.join(self.temp_dir, f"test_{module_name}.py")
+#             with open(test_script_path, 'w') as f:
+#                 f.write(test_content)
+            
+#             return test_script_path
+            
+#         except Exception as e:
+#             print(f"Failed to create test script for {module_path}: {e}")
+#             return None
+
+    def create_test_script_for_module(self, module_path: str) -> Optional[str]:
+        """Create a simple test script for a module using introspection.
+        Skips functions and classes requiring arguments, instantiates no-arg classes."""
         try:
-            # Analyze the module to find classes and functions
-            with open(module_path, 'r') as f:
-                content = f.read()
-            
-            # Simple extraction of class and function names
-            import ast
-            tree = ast.parse(content)
-            
-            classes = []
-            functions = []
-            
-            for node in ast.walk(tree):
-                if isinstance(node, ast.ClassDef):
-                    classes.append(node.name)
-                elif isinstance(node, ast.FunctionDef) and not node.name.startswith('_'):
-                    functions.append(node.name)
-            
-            # Create test script
-            module_name = os.path.splitext(os.path.basename(module_path))[0]
-            test_content = f'''
-#!/usr/bin/env python3
-"""Auto-generated test script for {module_name}"""
+            import inspect, os
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            # absolute paths
+            module_abspath  = os.path.abspath(module_path)
+            package_abspath = os.path.abspath(self.package_path)
+            # the directory above your package (so 'import emoji.xxx' works)
+            package_root    = os.path.dirname(package_abspath)
 
-try:
-    from {module_name} import *
-    
-    print(f"Testing module: {module_name}")
-    
-    # Test classes
-'''
-            
-            for class_name in classes:
-                test_content += f'''
-    try:
-        print(f"Testing class: {class_name}")
-        obj = {class_name}()
-        print(f"Created {class_name} instance")
-    except Exception as e:
-        print(f"Failed to test {class_name}: {{e}}")
-'''
-            
-            for func_name in functions:
-                test_content += f'''
-    try:
-        print(f"Testing function: {func_name}")
-        # Try calling with no args first
-        result = {func_name}()
-        print(f"{func_name}() returned: {{result}}")
-    except Exception as e:
-        print(f"Failed to test {func_name}: {{e}}")
-'''
-            
-            test_content += '''
-except Exception as e:
-    print(f"Failed to import module: {e}")
-'''
-            
-            # Save test script
-            test_script_path = os.path.join(self.temp_dir, f"test_{module_name}.py")
-            with open(test_script_path, 'w') as f:
-                f.write(test_content)
-            
+            # compute the python import path: e.g. 'emoji.tokenizer' or 'emoji.unicode_codes.data_dict'
+            rel_path    = os.path.relpath(module_abspath, package_root)
+            module_name = rel_path[:-3].replace(os.path.sep, '.')   # strip .py, replace / → .
+
+            # name the test file by replacing dots with underscores
+            safe_name       = module_name.replace('.', '_')
+            test_script_path = os.path.join(self.temp_dir, f"test_{safe_name}.py")
+
+            # build the harness
+            lines = [
+                "#!/usr/bin/env python3",
+                "import sys, os, inspect",
+                f"sys.path.insert(0, {repr(package_root)})",
+                f"import {module_name}",
+                f"print('--- Testing module: {module_name} ---')",
+                "for name, member in inspect.getmembers(" + module_name + "):",
+                "    # only classes/functions defined in this module",
+                f"    if inspect.isclass(member) and member.__module__ == {repr(module_name)}:",
+                "        sig = inspect.signature(member)",
+                "        if len(sig.parameters) == 0:",
+                "            try:",
+                "                instance = member()",
+                "                print(f'Created {module_name}.{name} instance')",
+                "            except Exception as e:",
+                "                print(f'Failed to instantiate {module_name}.{name}: {e}')",
+                "        else:",
+                "            print(f'Skipping class {module_name}.{name}: requires parameters')",
+                f"    elif inspect.isfunction(member) and member.__module__ == {repr(module_name)}:",
+                "        sig = inspect.signature(member)",
+                "        if len(sig.parameters) == 0:",
+                "            try:",
+                "                result = member()",
+                "                print(f'{module_name}.{name}() returned: {result}')",
+                "            except Exception as e:",
+                "                print(f'Failed to call {module_name}.{name}(): {e}')",
+                "        else:",
+                "            print(f'Skipping function {module_name}.{name}: requires parameters')",
+            ]
+
+            # write it out
+            with open(test_script_path, 'w', encoding='utf-8') as f:
+                f.write("\n".join(lines))
+
             return test_script_path
-            
+
         except Exception as e:
             print(f"Failed to create test script for {module_path}: {e}")
             return None
+
+
+
     
     def check_noworkflow_available(self) -> bool:
         """Check if noWorkflow is available"""

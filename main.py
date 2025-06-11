@@ -3,6 +3,7 @@ from datetime import datetime
 from extractor.codemeta_wrapper import extract_codemeta
 from extractor.hierarchical_walker import walk_python_modules_enhanced
 from extractor.converter import convert_to_enhanced_jsonld
+from extractor.runtime_extractor import extract_runtime_behavior
 
 OUTPUT_DIR = 'output_jsonld'
 
@@ -25,8 +26,12 @@ if __name__ == '__main__':
     print('📁 extracting enhanced hierarchy + analysis...')
     modules = walk_python_modules_enhanced(args.package_dir)
 
+    print("⏳ Running dynamic tests with noWorkflow/inspect…")
+    runtime = extract_runtime_behavior(args.package_dir)
+
     print('🧠 converting to enhanced JSON-LD...')
     jsonld = convert_to_enhanced_jsonld(meta, modules, args.name)
+    jsonld["runtimeBehavior"] = runtime
 
     ts = datetime.now().strftime('%Y%m%dT%H%M%SZ')
     save_jsonld(jsonld, f"{args.name}_{ts}")
