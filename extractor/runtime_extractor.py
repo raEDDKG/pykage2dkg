@@ -398,64 +398,64 @@ with tracer.start_as_current_span("script_execution"):
 
     def create_test_script_for_module(self, module_path: str) -> Optional[str]:
         """Create a simple test script for a module using introspection.
-        Skips functions and classes requiring arguments, instantiates no-arg classes."""
+        Skips anything requiring args, instantiates no-arg classes."""
         try:
-            import inspect, os
+            import inspect
 
-            # absolute paths
-            module_abspath  = os.path.abspath(module_path)
-            package_abspath = os.path.abspath(self.package_path)
-            # the directory above your package (so 'import emoji.xxx' works)
-            package_root    = os.path.dirname(package_abspath)
+            # compute package name and module import path
+            pkg_root = self.package_path
+            pkg_name = os.path.basename(pkg_root.rstrip(os.sep))
 
-            # compute the python import path: e.g. 'emoji.tokenizer' or 'emoji.unicode_codes.data_dict'
-            rel_path    = os.path.relpath(module_abspath, package_root)
-            module_name = rel_path[:-3].replace(os.path.sep, '.')   # strip .py, replace / → .
+            # e.g. module_path="/…/emoji/tokenizer.py" → rel="tokenizer.py" → mod_rel="tokenizer"
+            rel = os.path.relpath(module_path, pkg_root)
+            mod_rel = os.path.splitext(rel)[0].replace(os.sep, ".")
 
-            # name the test file by replacing dots with underscores
-            safe_name       = module_name.replace('.', '_')
-            test_script_path = os.path.join(self.temp_dir, f"test_{safe_name}.py")
+            # full import name: "emoji.tokenizer" or "emoji.unicode_codes.data_dict"
+            full_mod = f"{pkg_name}.{mod_rel}"
 
-            # build the harness
+            # parent of the package dir goes on PYTHONPATH
+            pkg_parent = os.path.dirname(pkg_root)
+
             lines = [
                 "#!/usr/bin/env python3",
-                "import sys, os, inspect",
-                f"sys.path.insert(0, {repr(package_root)})",
-                f"import {module_name}",
-                f"print('--- Testing module: {module_name} ---')",
-                "for name, member in inspect.getmembers(" + module_name + "):",
-                "    # only classes/functions defined in this module",
-                f"    if inspect.isclass(member) and member.__module__ == {repr(module_name)}:",
+                "import sys, inspect",
+                # make sure we can do `import emoji…`
+                f"sys.path.insert(0, {repr(pkg_parent)})",
+                f"import {full_mod}",
+                f"print('--- Testing module: {full_mod} ---')",
+                "for name, member in inspect.getmembers(" + full_mod + "):",
+                "    if inspect.isclass(member) and member.__module__ == " + repr(full_mod) + ":",
                 "        sig = inspect.signature(member)",
                 "        if len(sig.parameters) == 0:",
                 "            try:",
                 "                instance = member()",
-                "                print(f'Created {module_name}.{name} instance')",
+                "                print(f'Created class {name}')",
                 "            except Exception as e:",
-                "                print(f'Failed to instantiate {module_name}.{name}: {e}')",
+                "                print(f'Failed to instantiate {name}: {e}')",
                 "        else:",
-                "            print(f'Skipping class {module_name}.{name}: requires parameters')",
-                f"    elif inspect.isfunction(member) and member.__module__ == {repr(module_name)}:",
+                "            print(f'Skipping class {name}: requires parameters')",
+                "    elif inspect.isfunction(member) and member.__module__ == " + repr(full_mod) + ":",
                 "        sig = inspect.signature(member)",
                 "        if len(sig.parameters) == 0:",
                 "            try:",
                 "                result = member()",
-                "                print(f'{module_name}.{name}() returned: {result}')",
+                "                print(f'{name}() returned: {result}')",
                 "            except Exception as e:",
-                "                print(f'Failed to call {module_name}.{name}(): {e}')",
+                "                print(f'Failed to call {name}(): {e}')",
                 "        else:",
-                "            print(f'Skipping function {module_name}.{name}: requires parameters')",
+                "            print(f'Skipping function {name}: requires parameters')",
             ]
 
             # write it out
-            with open(test_script_path, 'w', encoding='utf-8') as f:
-                f.write("\n".join(lines))
-
-            return test_script_path
+            test_script = os.path.join(self.temp_dir, f"test_{mod_rel.replace('.', '_')}.py")
+            with open(test_script, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines) + "\n")
+            return test_script
 
         except Exception as e:
             print(f"Failed to create test script for {module_path}: {e}")
             return None
+
 
 
 
