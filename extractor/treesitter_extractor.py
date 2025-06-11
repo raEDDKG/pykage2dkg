@@ -8,6 +8,9 @@ try:
 except ImportError as e:
     print(f"Warning: Tree-sitter not available: {e}")
     TREE_SITTER_AVAILABLE = False
+    # Create dummy classes for type hints
+    class Node:
+        pass
 
 from typing import Dict, List, Any, Optional
 import os

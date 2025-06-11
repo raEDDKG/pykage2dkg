@@ -2449,8 +2449,8 @@
                   "description": "Splits a ZWJ-emoji into its constituents.\n\n:returns: An :class:`EmojiMatchZWJ` containing the \"sub-emoji\" if this is a ZWJ-emoji, otherwise self",
                   "decorators": [],
                   "calls": [
-                    "is_zwj",
-                    "EmojiMatchZWJ"
+                    "EmojiMatchZWJ",
+                    "is_zwj"
                   ],
                   "isAsync": false,
                   "inClass": "EmojiMatch",
@@ -4020,13 +4020,13 @@
                   "description": "",
                   "decorators": [],
                   "calls": [
+                    "get",
+                    "__init__",
                     "split",
                     "EmojiMatch",
                     "len",
-                    "__init__",
-                    "get",
-                    "append",
-                    "super"
+                    "super",
+                    "append"
                   ],
                   "isAsync": false,
                   "inClass": "EmojiMatchZWJ",
@@ -9509,8 +9509,8 @@
                   "description": "",
                   "decorators": [],
                   "calls": [
-                    "append",
-                    "_update"
+                    "_update",
+                    "append"
                   ],
                   "isAsync": false,
                   "inClass": "EmojiMatchZWJNonRGI",
@@ -10300,12 +10300,12 @@
               "description": "Finds unicode emoji in a string. Yields all normal characters as a named\ntuple :class:`Token` ``(char, char)`` and all emoji as :class:`Token` ``(chars, EmojiMatch)``.\n\n:param string: String contains unicode characters. MUST BE UNICODE.\n:param keep_zwj: Should ZWJ-characters (``\\u200D``) that join non-RGI emoji be\n    skipped or should be yielded as normal characters\n:return: An iterable of tuples :class:`Token` ``(char, char)`` or :class:`Token` ``(chars, EmojiMatch)``",
               "decorators": [],
               "calls": [
-                "len",
-                "EmojiMatch",
                 "Token",
-                "append",
+                "EmojiMatch",
+                "len",
                 "get_search_tree",
-                "sum"
+                "sum",
+                "append"
               ],
               "isAsync": false,
               "summary": "Finds unicode emoji in a string . Yields all normal characters as a named sequence and all emoji as a named sequence .",
@@ -11087,12 +11087,12 @@
               "description": "Filters the output of `tokenize()`\n\n:param matches: An iterable of tuples of the form ``(match_str, result)``\n    where ``result`` is either an EmojiMatch or a string.\n:param emoji_only: If True, only EmojiMatch are returned in the output.\n    If False all characters are returned\n:param join_emoji: If True, multiple EmojiMatch are merged into\n    a single :class:`EmojiMatchZWJNonRGI` if they are separated only by a ZWJ.\n\n:return: An iterable of tuples :class:`Token` ``(char, char)``,\n    :class:`Token` ``(chars, EmojiMatch)`` or :class:`Token` ``(chars, EmojiMatchZWJNonRGI)``",
               "decorators": [],
               "calls": [
-                "Token",
                 "isinstance",
-                "_add",
-                "append",
+                "Token",
+                "EmojiMatchZWJNonRGI",
                 "pop",
-                "EmojiMatchZWJNonRGI"
+                "append",
+                "_add"
               ],
               "isAsync": false,
               "summary": "Returns a list of tokens from a sequence of tokens .",
@@ -11874,8 +11874,8 @@
               "description": "Generate a search tree for demojize().\nExample of a search tree::\n\n    EMOJI_DATA =\n    {'a': {'en': ':Apple:'},\n    'b': {'en': ':Bus:'},\n    'ba': {'en': ':Bat:'},\n    'band': {'en': ':Beatles:'},\n    'bandit': {'en': ':Outlaw:'},\n    'bank': {'en': ':BankOfEngland:'},\n    'bb': {'en': ':BB-gun:'},\n    'c': {'en': ':Car:'}}\n\n    _SEARCH_TREE =\n    {'a': {'data': {'en': ':Apple:'}},\n    'b': {'a': {'data': {'en': ':Bat:'},\n                'n': {'d': {'data': {'en': ':Beatles:'},\n                            'i': {'t': {'data': {'en': ':Outlaw:'}}}},\n                    'k': {'data': {'en': ':BankOfEngland:'}}}},\n        'b': {'data': {'en': ':BB-gun:'}},\n        'data': {'en': ':Bus:'}},\n    'c': {'data': {'en': ':Car:'}}}\n\n               _SEARCH_TREE\n             /     |        \u29f5\n           /       |          \u29f5\n        a          b             c\n        |        / |  \u29f5          |\n        |       /  |    \u29f5        |\n    :Apple:   ba  :Bus:  bb     :Car:\n             /  \u29f5         |\n            /    \u29f5        |\n          :Bat:    ban     :BB-gun:\n                 /     \u29f5\n                /       \u29f5\n             band       bank\n            /   \u29f5         |\n           /     \u29f5        |\n        bandi :Beatles:  :BankOfEngland:\n           |\n        bandit\n           |\n       :Outlaw:",
               "decorators": [],
               "calls": [
-                "len",
-                "enumerate"
+                "enumerate",
+                "len"
               ],
               "isAsync": false,
               "summary": "Generate a search tree for a given sequence .",
@@ -15010,8 +15010,8 @@
                       "description": "Splits a ZWJ-emoji into its constituents.\n\n:returns: An :class:`EmojiMatchZWJ` containing the \"sub-emoji\" if this is a ZWJ-emoji, otherwise self",
                       "decorators": [],
                       "calls": [
-                        "is_zwj",
-                        "EmojiMatchZWJ"
+                        "EmojiMatchZWJ",
+                        "is_zwj"
                       ],
                       "isAsync": false,
                       "inClass": "EmojiMatch",
@@ -16581,13 +16581,13 @@
                       "description": "",
                       "decorators": [],
                       "calls": [
+                        "get",
+                        "__init__",
                         "split",
                         "EmojiMatch",
                         "len",
-                        "__init__",
-                        "get",
-                        "append",
-                        "super"
+                        "super",
+                        "append"
                       ],
                       "isAsync": false,
                       "inClass": "EmojiMatchZWJ",
@@ -22070,8 +22070,8 @@
                       "description": "",
                       "decorators": [],
                       "calls": [
-                        "append",
-                        "_update"
+                        "_update",
+                        "append"
                       ],
                       "isAsync": false,
                       "inClass": "EmojiMatchZWJNonRGI",
@@ -22863,12 +22863,12 @@
                   "description": "Finds unicode emoji in a string. Yields all normal characters as a named\ntuple :class:`Token` ``(char, char)`` and all emoji as :class:`Token` ``(chars, EmojiMatch)``.\n\n:param string: String contains unicode characters. MUST BE UNICODE.\n:param keep_zwj: Should ZWJ-characters (``\\u200D``) that join non-RGI emoji be\n    skipped or should be yielded as normal characters\n:return: An iterable of tuples :class:`Token` ``(char, char)`` or :class:`Token` ``(chars, EmojiMatch)``",
                   "decorators": [],
                   "calls": [
-                    "len",
-                    "EmojiMatch",
                     "Token",
-                    "append",
+                    "EmojiMatch",
+                    "len",
                     "get_search_tree",
-                    "sum"
+                    "sum",
+                    "append"
                   ],
                   "isAsync": false,
                   "summary": "Finds unicode emoji in a string . Yields all normal characters as a named sequence and all emoji as a named sequence .",
@@ -23650,12 +23650,12 @@
                   "description": "Filters the output of `tokenize()`\n\n:param matches: An iterable of tuples of the form ``(match_str, result)``\n    where ``result`` is either an EmojiMatch or a string.\n:param emoji_only: If True, only EmojiMatch are returned in the output.\n    If False all characters are returned\n:param join_emoji: If True, multiple EmojiMatch are merged into\n    a single :class:`EmojiMatchZWJNonRGI` if they are separated only by a ZWJ.\n\n:return: An iterable of tuples :class:`Token` ``(char, char)``,\n    :class:`Token` ``(chars, EmojiMatch)`` or :class:`Token` ``(chars, EmojiMatchZWJNonRGI)``",
                   "decorators": [],
                   "calls": [
-                    "Token",
                     "isinstance",
-                    "_add",
-                    "append",
+                    "Token",
+                    "EmojiMatchZWJNonRGI",
                     "pop",
-                    "EmojiMatchZWJNonRGI"
+                    "append",
+                    "_add"
                   ],
                   "isAsync": false,
                   "summary": "Returns a list of tokens from a sequence of tokens .",
@@ -24437,8 +24437,8 @@
                   "description": "Generate a search tree for demojize().\nExample of a search tree::\n\n    EMOJI_DATA =\n    {'a': {'en': ':Apple:'},\n    'b': {'en': ':Bus:'},\n    'ba': {'en': ':Bat:'},\n    'band': {'en': ':Beatles:'},\n    'bandit': {'en': ':Outlaw:'},\n    'bank': {'en': ':BankOfEngland:'},\n    'bb': {'en': ':BB-gun:'},\n    'c': {'en': ':Car:'}}\n\n    _SEARCH_TREE =\n    {'a': {'data': {'en': ':Apple:'}},\n    'b': {'a': {'data': {'en': ':Bat:'},\n                'n': {'d': {'data': {'en': ':Beatles:'},\n                            'i': {'t': {'data': {'en': ':Outlaw:'}}}},\n                    'k': {'data': {'en': ':BankOfEngland:'}}}},\n        'b': {'data': {'en': ':BB-gun:'}},\n        'data': {'en': ':Bus:'}},\n    'c': {'data': {'en': ':Car:'}}}\n\n               _SEARCH_TREE\n             /     |        \u29f5\n           /       |          \u29f5\n        a          b             c\n        |        / |  \u29f5          |\n        |       /  |    \u29f5        |\n    :Apple:   ba  :Bus:  bb     :Car:\n             /  \u29f5         |\n            /    \u29f5        |\n          :Bat:    ban     :BB-gun:\n                 /     \u29f5\n                /       \u29f5\n             band       bank\n            /   \u29f5         |\n           /     \u29f5        |\n        bandi :Beatles:  :BankOfEngland:\n           |\n        bandit\n           |\n       :Outlaw:",
                   "decorators": [],
                   "calls": [
-                    "len",
-                    "enumerate"
+                    "enumerate",
+                    "len"
                   ],
                   "isAsync": false,
                   "summary": "Generate a search tree for a given sequence .",
@@ -26279,7 +26279,7 @@
           "documentation": {
             "error": "Dossier extraction failed: [Errno 2] No such file or directory: 'dossier'"
           },
-          "analysisTimestamp": "2025-06-10T15:41:50.402035"
+          "analysisTimestamp": "2025-06-11T01:19:22.810959"
         },
         {
           "@type": "CodeFile",
@@ -26378,7 +26378,7 @@
           "documentation": {
             "error": "Dossier extraction failed: [Errno 2] No such file or directory: 'dossier'"
           },
-          "analysisTimestamp": "2025-06-10T15:41:50.405476"
+          "analysisTimestamp": "2025-06-11T01:19:22.814498"
         },
         {
           "@type": "CodeFile",
@@ -26404,8 +26404,8 @@
                     "staticmethod"
                   ],
                   "calls": [
-                    "isinstance",
-                    "load_from_json"
+                    "load_from_json",
+                    "isinstance"
                   ],
                   "isAsync": false,
                   "inClass": "config",
@@ -27190,21 +27190,21 @@
               "description": "Replace emoji names in a string with Unicode codes.\n    >>> import emoji\n    >>> print(emoji.emojize(\"Python is fun :thumbsup:\", language='alias'))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.emojize(\"Python is fun :thumbs_up:\"))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.emojize(\"Python is fun {thumbs_up}\", delimiters = (\"{\", \"}\")))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.emojize(\"Python is fun :red_heart:\", variant=\"text_type\"))\n    Python is fun \u2764\n    >>> print(emoji.emojize(\"Python is fun :red_heart:\", variant=\"emoji_type\"))\n    Python is fun \u2764\ufe0f # red heart, not black heart\n\n:param string: String contains emoji names.\n:param delimiters: (optional) Use delimiters other than _DEFAULT_DELIMITER. Each delimiter\n    should contain at least one character that is not part of a-zA-Z0-9 and ``_-&.()!?#*+,``.\n    See ``emoji.core._EMOJI_NAME_PATTERN`` for the regular expression of unsafe characters.\n:param variant: (optional) Choose variation selector between \"base\"(None), VS-15 (\"text_type\") and VS-16 (\"emoji_type\")\n:param language: Choose language of emoji name: language code 'es', 'de', etc. or 'alias'\n    to use English aliases\n:param version: (optional) Max version. If set to an Emoji Version,\n    all emoji above this version will be ignored.\n:param handle_version: (optional) Replace the emoji above ``version``\n    instead of ignoring it. handle_version can be either a string or a\n    callable; If it is a callable, it's passed the Unicode emoji and the\n    data dict from :data:`EMOJI_DATA` and must return a replacement string\n    to be used::\n\n        handle_version('\\U0001F6EB', {\n            'en' : ':airplane_departure:',\n            'status' : fully_qualified,\n            'E' : 1,\n            'alias' : [':flight_departure:'],\n            'de': ':abflug:',\n            'es': ':avi\u00f3n_despegando:',\n            ...\n        })\n\n:raises ValueError: if ``variant`` is neither None, 'text_type' or 'emoji_type'",
               "decorators": [],
               "calls": [
-                "group",
-                "len",
-                "copy",
-                "get_emoji_by_name",
-                "load_from_json",
-                "callable",
-                "ValueError",
-                "str",
-                "normalize",
                 "handle_version",
-                "sub",
-                "escape",
-                "end",
+                "normalize",
+                "load_from_json",
+                "get_emoji_by_name",
+                "callable",
+                "str",
+                "group",
+                "copy",
+                "len",
+                "ValueError",
+                "compile",
                 "start",
-                "compile"
+                "end",
+                "sub",
+                "escape"
               ],
               "isAsync": false,
               "summary": "Return a summary of a sequence of emoji names in a string .",
@@ -27986,8 +27986,8 @@
               "description": "Find unicode emoji in a string. Yield each emoji as a named tuple\n:class:`Token` ``(chars, EmojiMatch)`` or :class:`Token` ``(chars, EmojiMatchZWJNonRGI)``.\nIf ``non_emoji`` is True, also yield all other characters as\n:class:`Token` ``(char, char)`` .\n\n:param string: String to analyze\n:param non_emoji: If True also yield all non-emoji characters as Token(char, char)\n:param join_emoji: If True, multiple EmojiMatch are merged into a single\n    EmojiMatchZWJNonRGI if they are separated only by a ZWJ.",
               "decorators": [],
               "calls": [
-                "filter_tokens",
-                "tokenize"
+                "tokenize",
+                "filter_tokens"
               ],
               "isAsync": false,
               "summary": "Find unicode emoji in a string and yield all tokens .",
@@ -28769,15 +28769,15 @@
               "description": "Replace Unicode emoji in a string with emoji shortcodes. Useful for storage.\n    >>> import emoji\n    >>> print(emoji.emojize(\"Python is fun :thumbs_up:\"))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.demojize(\"Python is fun \ud83d\udc4d\"))\n    Python is fun :thumbs_up:\n    >>> print(emoji.demojize(\"icode is tricky \ud83d\ude2f\", delimiters=(\"__\", \"__\")))\n    Unicode is tricky __hushed_face__\n\n:param string: String contains Unicode characters. MUST BE UNICODE.\n:param delimiters: (optional) User delimiters other than ``_DEFAULT_DELIMITER``\n:param language: Choose language of emoji name: language code 'es', 'de', etc. or 'alias'\n    to use English aliases\n:param version: (optional) Max version. If set to an Emoji Version,\n    all emoji above this version will be removed.\n:param handle_version: (optional) Replace the emoji above ``version``\n    instead of removing it. handle_version can be either a string or a\n    callable ``handle_version(emj: str, data: dict) -> str``; If it is\n    a callable, it's passed the Unicode emoji and the data dict from\n    :data:`EMOJI_DATA` and must return a replacement string  to be used.\n    The passed data is in the form of::\n\n        handle_version('\\U0001F6EB', {\n            'en' : ':airplane_departure:',\n            'status' : fully_qualified,\n            'E' : 1,\n            'alias' : [':flight_departure:'],\n            'de': ':abflug:',\n            'es': ':avi\u00f3n_despegando:',\n            ...\n        })",
               "decorators": [],
               "calls": [
-                "data_copy",
+                "handle_version",
+                "join",
+                "isinstance",
                 "load_from_json",
                 "callable",
                 "str",
-                "isinstance",
-                "join",
-                "handle_version",
-                "handle",
-                "tokenize"
+                "data_copy",
+                "tokenize",
+                "handle"
               ],
               "isAsync": false,
               "summary": "This function prints a summary of a sequence of words in a sequence of Unicode shortcodes .",
@@ -29559,15 +29559,15 @@
               "description": "Replace Unicode emoji in a customizable string.\n\n:param string: String contains Unicode characters. MUST BE UNICODE.\n:param replace: (optional) replace can be either a string or a callable;\n    If it is a callable, it's passed the Unicode emoji and the data dict from\n    :data:`EMOJI_DATA` and must return a replacement string to be used.\n    replace(str, dict) -> str\n:param version: (optional) Max version. If set to an Emoji Version,\n    only emoji above this version will be replaced.",
               "decorators": [],
               "calls": [
-                "data_copy",
-                "callable",
-                "str",
-                "filter_tokens",
-                "isinstance",
                 "join",
                 "replace",
-                "handle",
-                "tokenize"
+                "filter_tokens",
+                "isinstance",
+                "callable",
+                "str",
+                "data_copy",
+                "tokenize",
+                "handle"
               ],
               "isAsync": false,
               "summary": "Summarize a string by replacing Unicode emoji in a customizable string .",
@@ -30349,8 +30349,8 @@
               "description": "Returns the location and emoji in list of dict format.\n    >>> emoji.emoji_list(\"Hi, I am fine. \ud83d\ude01\")\n    [{'match_start': 15, 'match_end': 16, 'emoji': '\ud83d\ude01'}]",
               "decorators": [],
               "calls": [
-                "isinstance",
-                "tokenize"
+                "tokenize",
+                "isinstance"
               ],
               "isAsync": false,
               "summary": "Returns the location and emoji in list of dict format .",
@@ -31915,9 +31915,9 @@
               "description": "Returns the count of emojis in a string.\n\n:param unique: (optional) True if count only unique emojis",
               "decorators": [],
               "calls": [
-                "len",
+                "distinct_emoji_list",
                 "emoji_list",
-                "distinct_emoji_list"
+                "len"
               ],
               "isAsync": false,
               "summary": "Returns the number of emojis in a string .",
@@ -33479,9 +33479,9 @@
               "description": "Returns True if the string contains only emojis.\nThis might not imply that `is_emoji` for all the characters, for example,\nif the string contains variation selectors.",
               "decorators": [],
               "calls": [
-                "all",
+                "analyze",
                 "isinstance",
-                "analyze"
+                "all"
               ],
               "isAsync": false,
               "summary": "Returns True if the string contains only emojis . It also returns True if the string contains only emoji .",
@@ -34263,11 +34263,11 @@
               "description": "Returns the Emoji Version of the emoji.\n\nSee https://www.unicode.org/reports/tr51/#Versioning for more information.\n    >>> emoji.version(\"\ud83d\ude01\")\n    0.6\n    >>> emoji.version(\":butterfly:\")\n    3\n\n:param string: An emoji or a text containing an emoji\n:raises ValueError: if ``string`` does not contain an emoji",
               "decorators": [],
               "calls": [
-                "ValueError",
-                "get_emoji_by_name",
                 "replace_emoji",
-                "emojize",
-                "append"
+                "get_emoji_by_name",
+                "ValueError",
+                "append",
+                "emojize"
               ],
               "isAsync": false,
               "summary": "Returns a summary of the sequence of emoji in a string .",
@@ -35064,8 +35064,8 @@
                         "staticmethod"
                       ],
                       "calls": [
-                        "isinstance",
-                        "load_from_json"
+                        "load_from_json",
+                        "isinstance"
                       ],
                       "isAsync": false,
                       "inClass": "config",
@@ -35852,21 +35852,21 @@
                   "description": "Replace emoji names in a string with Unicode codes.\n    >>> import emoji\n    >>> print(emoji.emojize(\"Python is fun :thumbsup:\", language='alias'))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.emojize(\"Python is fun :thumbs_up:\"))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.emojize(\"Python is fun {thumbs_up}\", delimiters = (\"{\", \"}\")))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.emojize(\"Python is fun :red_heart:\", variant=\"text_type\"))\n    Python is fun \u2764\n    >>> print(emoji.emojize(\"Python is fun :red_heart:\", variant=\"emoji_type\"))\n    Python is fun \u2764\ufe0f # red heart, not black heart\n\n:param string: String contains emoji names.\n:param delimiters: (optional) Use delimiters other than _DEFAULT_DELIMITER. Each delimiter\n    should contain at least one character that is not part of a-zA-Z0-9 and ``_-&.()!?#*+,``.\n    See ``emoji.core._EMOJI_NAME_PATTERN`` for the regular expression of unsafe characters.\n:param variant: (optional) Choose variation selector between \"base\"(None), VS-15 (\"text_type\") and VS-16 (\"emoji_type\")\n:param language: Choose language of emoji name: language code 'es', 'de', etc. or 'alias'\n    to use English aliases\n:param version: (optional) Max version. If set to an Emoji Version,\n    all emoji above this version will be ignored.\n:param handle_version: (optional) Replace the emoji above ``version``\n    instead of ignoring it. handle_version can be either a string or a\n    callable; If it is a callable, it's passed the Unicode emoji and the\n    data dict from :data:`EMOJI_DATA` and must return a replacement string\n    to be used::\n\n        handle_version('\\U0001F6EB', {\n            'en' : ':airplane_departure:',\n            'status' : fully_qualified,\n            'E' : 1,\n            'alias' : [':flight_departure:'],\n            'de': ':abflug:',\n            'es': ':avi\u00f3n_despegando:',\n            ...\n        })\n\n:raises ValueError: if ``variant`` is neither None, 'text_type' or 'emoji_type'",
                   "decorators": [],
                   "calls": [
-                    "group",
-                    "len",
-                    "copy",
-                    "get_emoji_by_name",
-                    "load_from_json",
-                    "callable",
-                    "ValueError",
-                    "str",
-                    "normalize",
                     "handle_version",
-                    "sub",
-                    "escape",
-                    "end",
+                    "normalize",
+                    "load_from_json",
+                    "get_emoji_by_name",
+                    "callable",
+                    "str",
+                    "group",
+                    "copy",
+                    "len",
+                    "ValueError",
+                    "compile",
                     "start",
-                    "compile"
+                    "end",
+                    "sub",
+                    "escape"
                   ],
                   "isAsync": false,
                   "summary": "Return a summary of a sequence of emoji names in a string .",
@@ -36648,8 +36648,8 @@
                   "description": "Find unicode emoji in a string. Yield each emoji as a named tuple\n:class:`Token` ``(chars, EmojiMatch)`` or :class:`Token` ``(chars, EmojiMatchZWJNonRGI)``.\nIf ``non_emoji`` is True, also yield all other characters as\n:class:`Token` ``(char, char)`` .\n\n:param string: String to analyze\n:param non_emoji: If True also yield all non-emoji characters as Token(char, char)\n:param join_emoji: If True, multiple EmojiMatch are merged into a single\n    EmojiMatchZWJNonRGI if they are separated only by a ZWJ.",
                   "decorators": [],
                   "calls": [
-                    "filter_tokens",
-                    "tokenize"
+                    "tokenize",
+                    "filter_tokens"
                   ],
                   "isAsync": false,
                   "summary": "Find unicode emoji in a string and yield all tokens .",
@@ -37431,15 +37431,15 @@
                   "description": "Replace Unicode emoji in a string with emoji shortcodes. Useful for storage.\n    >>> import emoji\n    >>> print(emoji.emojize(\"Python is fun :thumbs_up:\"))\n    Python is fun \ud83d\udc4d\n    >>> print(emoji.demojize(\"Python is fun \ud83d\udc4d\"))\n    Python is fun :thumbs_up:\n    >>> print(emoji.demojize(\"icode is tricky \ud83d\ude2f\", delimiters=(\"__\", \"__\")))\n    Unicode is tricky __hushed_face__\n\n:param string: String contains Unicode characters. MUST BE UNICODE.\n:param delimiters: (optional) User delimiters other than ``_DEFAULT_DELIMITER``\n:param language: Choose language of emoji name: language code 'es', 'de', etc. or 'alias'\n    to use English aliases\n:param version: (optional) Max version. If set to an Emoji Version,\n    all emoji above this version will be removed.\n:param handle_version: (optional) Replace the emoji above ``version``\n    instead of removing it. handle_version can be either a string or a\n    callable ``handle_version(emj: str, data: dict) -> str``; If it is\n    a callable, it's passed the Unicode emoji and the data dict from\n    :data:`EMOJI_DATA` and must return a replacement string  to be used.\n    The passed data is in the form of::\n\n        handle_version('\\U0001F6EB', {\n            'en' : ':airplane_departure:',\n            'status' : fully_qualified,\n            'E' : 1,\n            'alias' : [':flight_departure:'],\n            'de': ':abflug:',\n            'es': ':avi\u00f3n_despegando:',\n            ...\n        })",
                   "decorators": [],
                   "calls": [
-                    "data_copy",
+                    "handle_version",
+                    "join",
+                    "isinstance",
                     "load_from_json",
                     "callable",
                     "str",
-                    "isinstance",
-                    "join",
-                    "handle_version",
-                    "handle",
-                    "tokenize"
+                    "data_copy",
+                    "tokenize",
+                    "handle"
                   ],
                   "isAsync": false,
                   "summary": "This function prints a summary of a sequence of words in a sequence of Unicode shortcodes .",
@@ -38221,15 +38221,15 @@
                   "description": "Replace Unicode emoji in a customizable string.\n\n:param string: String contains Unicode characters. MUST BE UNICODE.\n:param replace: (optional) replace can be either a string or a callable;\n    If it is a callable, it's passed the Unicode emoji and the data dict from\n    :data:`EMOJI_DATA` and must return a replacement string to be used.\n    replace(str, dict) -> str\n:param version: (optional) Max version. If set to an Emoji Version,\n    only emoji above this version will be replaced.",
                   "decorators": [],
                   "calls": [
-                    "data_copy",
-                    "callable",
-                    "str",
-                    "filter_tokens",
-                    "isinstance",
                     "join",
                     "replace",
-                    "handle",
-                    "tokenize"
+                    "filter_tokens",
+                    "isinstance",
+                    "callable",
+                    "str",
+                    "data_copy",
+                    "tokenize",
+                    "handle"
                   ],
                   "isAsync": false,
                   "summary": "Summarize a string by replacing Unicode emoji in a customizable string .",
@@ -39011,8 +39011,8 @@
                   "description": "Returns the location and emoji in list of dict format.\n    >>> emoji.emoji_list(\"Hi, I am fine. \ud83d\ude01\")\n    [{'match_start': 15, 'match_end': 16, 'emoji': '\ud83d\ude01'}]",
                   "decorators": [],
                   "calls": [
-                    "isinstance",
-                    "tokenize"
+                    "tokenize",
+                    "isinstance"
                   ],
                   "isAsync": false,
                   "summary": "Returns the location and emoji in list of dict format .",
@@ -40577,9 +40577,9 @@
                   "description": "Returns the count of emojis in a string.\n\n:param unique: (optional) True if count only unique emojis",
                   "decorators": [],
                   "calls": [
-                    "len",
+                    "distinct_emoji_list",
                     "emoji_list",
-                    "distinct_emoji_list"
+                    "len"
                   ],
                   "isAsync": false,
                   "summary": "Returns the number of emojis in a string .",
@@ -42141,9 +42141,9 @@
                   "description": "Returns True if the string contains only emojis.\nThis might not imply that `is_emoji` for all the characters, for example,\nif the string contains variation selectors.",
                   "decorators": [],
                   "calls": [
-                    "all",
+                    "analyze",
                     "isinstance",
-                    "analyze"
+                    "all"
                   ],
                   "isAsync": false,
                   "summary": "Returns True if the string contains only emojis . It also returns True if the string contains only emoji .",
@@ -42925,11 +42925,11 @@
                   "description": "Returns the Emoji Version of the emoji.\n\nSee https://www.unicode.org/reports/tr51/#Versioning for more information.\n    >>> emoji.version(\"\ud83d\ude01\")\n    0.6\n    >>> emoji.version(\":butterfly:\")\n    3\n\n:param string: An emoji or a text containing an emoji\n:raises ValueError: if ``string`` does not contain an emoji",
                   "decorators": [],
                   "calls": [
-                    "ValueError",
-                    "get_emoji_by_name",
                     "replace_emoji",
-                    "emojize",
-                    "append"
+                    "get_emoji_by_name",
+                    "ValueError",
+                    "append",
+                    "emojize"
                   ],
                   "isAsync": false,
                   "summary": "Returns a summary of the sequence of emoji in a string .",
@@ -44508,9 +44508,46 @@
           "documentation": {
             "error": "Dossier extraction failed: [Errno 2] No such file or directory: 'dossier'"
           },
-          "analysisTimestamp": "2025-06-10T15:42:39.688831"
+          "analysisTimestamp": "2025-06-11T01:20:00.037783"
         }
-      ]
+      ],
+      "runtimeBehavior": {
+        "@type": "RuntimeBehavior",
+        "@context": {
+          "prov": "http://www.w3.org/ns/prov#",
+          "now": "https://github.com/gems-uff/noworkflow#"
+        },
+        "tool": "noWorkflow",
+        "version": "noWorkflow 2.0.1",
+        "executions": [
+          {
+            "@type": "ScriptExecution",
+            "script": "/tmp/noworkflow_abm0iodi/auto_test.py",
+            "stdout": "=== noWorkflow Runtime Analysis ===\nTesting module: tokenizer\nFailed to test tokenizer: No module named 'tokenizer'\nTesting module: core\nFailed to test core: No module named 'core'\nTesting module: unicode_codes.data_dict\nFailed to test unicode_codes.data_dict: No module named 'unicode_codes'\n=== Analysis Complete ===\n",
+            "executionTime": 0.10771703720092773,
+            "provenance": {
+              "@type": "ProvenanceData",
+              "@context": {
+                "prov": "http://www.w3.org/ns/prov#"
+              },
+              "trial": {
+                "@type": "prov:Activity",
+                "@id": "trial:2c4b6ccd-e65a-45f0-b76b-62d154131c3b",
+                "script": "auto_test.py",
+                "startTime": 1749590416.790861,
+                "endTime": 1749590416.898578,
+                "duration": 0.10771703720092773,
+                "command": "run auto_test.py",
+                "status": "finished"
+              },
+              "activities": [],
+              "entities": [],
+              "format": "PROV-inspired-JSON-LD"
+            },
+            "status": "success"
+          }
+        ]
+      }
     },
     {
       "@type": "CodeModule",
@@ -44533,9 +44570,9 @@
                   "description": "Auto load language `key`, raises KeyError if language is no supported.",
                   "decorators": [],
                   "calls": [
-                    "warn",
+                    "KeyError",
                     "load_from_json",
-                    "KeyError"
+                    "warn"
                   ],
                   "isAsync": false,
                   "inClass": "EmojiDataDict",
@@ -45322,9 +45359,9 @@
                 "lru_cache(maxsize=4000)"
               ],
               "calls": [
-                "get",
+                "items",
                 "lru_cache",
-                "items"
+                "get"
               ],
               "isAsync": false,
               "summary": "Return a summary of an emoji by short - name in a specific language .",
@@ -46106,10 +46143,10 @@
               "description": "",
               "decorators": [],
               "calls": [
-                "open",
                 "open_binary",
-                "files",
-                "joinpath"
+                "joinpath",
+                "open",
+                "files"
               ],
               "isAsync": false,
               "summary": "Open file with emoji . unicode_codes and return binary object .",
@@ -46891,10 +46928,10 @@
               "description": "",
               "decorators": [],
               "calls": [
-                "load",
-                "dict",
                 "list",
-                "_open_file"
+                "_open_file",
+                "load",
+                "dict"
               ],
               "isAsync": false,
               "summary": "Load the default emoji data from a JSON file .",
@@ -47677,10 +47714,10 @@
               "decorators": [],
               "calls": [
                 "load",
-                "append",
-                "_open_file",
                 "items",
-                "NotImplementedError"
+                "_open_file",
+                "NotImplementedError",
+                "append"
               ],
               "isAsync": false,
               "summary": "Load values from a json file into EMOJI_DATA .",
@@ -48470,9 +48507,9 @@
                       "description": "Auto load language `key`, raises KeyError if language is no supported.",
                       "decorators": [],
                       "calls": [
-                        "warn",
+                        "KeyError",
                         "load_from_json",
-                        "KeyError"
+                        "warn"
                       ],
                       "isAsync": false,
                       "inClass": "EmojiDataDict",
@@ -49261,9 +49298,9 @@
                     "lru_cache(maxsize=4000)"
                   ],
                   "calls": [
-                    "get",
+                    "items",
                     "lru_cache",
-                    "items"
+                    "get"
                   ],
                   "isAsync": false,
                   "summary": "Return a summary of an emoji by short - name in a specific language .",
@@ -50045,10 +50082,10 @@
                   "description": "",
                   "decorators": [],
                   "calls": [
-                    "open",
                     "open_binary",
-                    "files",
-                    "joinpath"
+                    "joinpath",
+                    "open",
+                    "files"
                   ],
                   "isAsync": false,
                   "summary": "Open file with emoji . unicode_codes and return binary object .",
@@ -50830,10 +50867,10 @@
                   "description": "",
                   "decorators": [],
                   "calls": [
-                    "load",
-                    "dict",
                     "list",
-                    "_open_file"
+                    "_open_file",
+                    "load",
+                    "dict"
                   ],
                   "isAsync": false,
                   "summary": "Load the default emoji data from a JSON file .",
@@ -51616,10 +51653,10 @@
                   "decorators": [],
                   "calls": [
                     "load",
-                    "append",
-                    "_open_file",
                     "items",
-                    "NotImplementedError"
+                    "_open_file",
+                    "NotImplementedError",
+                    "append"
                   ],
                   "isAsync": false,
                   "summary": "Load values from a json file into EMOJI_DATA .",
@@ -52783,7 +52820,7 @@
           "documentation": {
             "error": "Dossier extraction failed: [Errno 2] No such file or directory: 'dossier'"
           },
-          "analysisTimestamp": "2025-06-10T15:42:59.077720"
+          "analysisTimestamp": "2025-06-11T01:20:15.735842"
         },
         {
           "@type": "CodeFile",
@@ -52878,18 +52915,18 @@
           "documentation": {
             "error": "Dossier extraction failed: [Errno 2] No such file or directory: 'dossier'"
           },
-          "analysisTimestamp": "2025-06-10T15:42:59.102005"
+          "analysisTimestamp": "2025-06-11T01:20:15.759366"
         }
       ]
     }
   ],
   "analysisMetadata": {
     "@type": "AnalysisMetadata",
-    "timestamp": "2025-06-10T15:42:59.102048",
+    "timestamp": "2025-06-11T01:20:17.690340",
     "toolsUsed": [
-      "parso",
-      "tree-sitter",
       "libcst",
+      "tree-sitter",
+      "parso",
       "type-analysis",
       "security-analysis"
     ],
