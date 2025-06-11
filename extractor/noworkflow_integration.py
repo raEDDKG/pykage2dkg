@@ -12,7 +12,6 @@ import subprocess
 import tempfile
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from .runtime_extractor import extract_runtime_behavior
 
 class NoWorkflowIntegrator:
     """Integrates noWorkflow runtime analysis into the JSON-LD pipeline"""
@@ -27,16 +26,11 @@ class NoWorkflowIntegrator:
         
         print(f"🔄 Analyzing runtime behavior for: {package_path}")
         
-         # first try our new, inspect-based harness (which still uses noWorkflow for provenance)
-        try:
-            return extract_runtime_behavior(package_path)
-        except ImportError:
-             # fallback to the legacy noWorkflow-only logic
-            print("⚠️ runtime_extractor not found, falling back to built-in noWorkflow harness")
-            test_scripts = self.find_executable_scripts(package_path)
-            if not test_scripts:
-                print("⚠️ No executable scripts found, creating simple test script")
-                test_scripts = [self.create_simple_test_script(package_path)]
+        # Use legacy noWorkflow-only logic to avoid circular imports
+        test_scripts = self.find_executable_scripts(package_path)
+        if not test_scripts:
+            print("⚠️ No executable scripts found, creating simple test script")
+            test_scripts = [self.create_simple_test_script(package_path)]
         
         runtime_data = {
             "@type": "RuntimeBehavior",

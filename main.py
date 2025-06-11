@@ -30,8 +30,7 @@ if __name__ == '__main__':
     runtime = extract_runtime_behavior(args.package_dir)
 
     print('🧠 converting to enhanced JSON-LD...')
-    jsonld = convert_to_enhanced_jsonld(meta, modules, args.name)
-    jsonld["runtimeBehavior"] = runtime
+    jsonld = convert_to_enhanced_jsonld(meta, modules, args.name, runtime, args.package_dir)
 
     ts = datetime.now().strftime('%Y%m%dT%H%M%SZ')
     save_jsonld(jsonld, f"{args.name}_{ts}")

@@ -1,4 +1,6 @@
 from datetime import datetime
+import os
+from typing import Dict, List, Any, Optional
 
 def extract_analysis_summary(modules):
     tools_used = set()
@@ -27,15 +29,120 @@ def extract_analysis_summary(modules):
         'crossLanguageSupport': cross_lang
     }
 
-def convert_to_enhanced_jsonld(metadata, modules, package_name):
+def distribute_runtime_behavior_to_files(modules: List[Dict[str, Any]], runtime_behavior: Dict[str, Any], package_path: str) -> None:
+    """
+    Distribute runtime behavior data to the appropriate CodeFile sections.
+    This makes it easier for AI agents to understand the connection between static code and runtime behavior.
+    """
+    if not runtime_behavior:
+        return
+    
+    # Extract execution data from both smart analysis and noworkflow analysis
+    all_executions = []
+    
+    # Get smart analysis executions
+    smart_analysis = runtime_behavior.get('smart_analysis', {})
+    if smart_analysis.get('executions'):
+        all_executions.extend(smart_analysis['executions'])
+    
+    # Get noworkflow analysis executions  
+    noworkflow_analysis = runtime_behavior.get('noworkflow_analysis', {})
+    if noworkflow_analysis.get('executions'):
+        all_executions.extend(noworkflow_analysis['executions'])
+    
+    # If it's not a combined analysis, treat the whole thing as executions
+    if not smart_analysis and not noworkflow_analysis and runtime_behavior.get('executions'):
+        all_executions.extend(runtime_behavior['executions'])
+    
+    # Create a mapping from module names to runtime data
+    module_runtime_map = {}
+    
+    for execution in all_executions:
+        if execution.get('results') and execution['results'].get('module'):
+            module_name = execution['results']['module']
+            if module_name not in module_runtime_map:
+                module_runtime_map[module_name] = {
+                    '@type': 'RuntimeBehavior',
+                    'executions': [],
+                    'summary': {
+                        'functions_tested': [],
+                        'classes_tested': [],
+                        'functions_skipped': [],
+                        'classes_skipped': [],
+                        'errors': []
+                    }
+                }
+            
+            module_runtime_map[module_name]['executions'].append(execution)
+            
+            # Aggregate summary data
+            if execution.get('results'):
+                results = execution['results']
+                summary = module_runtime_map[module_name]['summary']
+                summary['functions_tested'].extend(results.get('functions_tested', []))
+                summary['classes_tested'].extend(results.get('classes_tested', []))
+                summary['functions_skipped'].extend(results.get('functions_skipped', []))
+                summary['classes_skipped'].extend(results.get('classes_skipped', []))
+                summary['errors'].extend(results.get('errors', []))
+    
+    # Now distribute this data to the appropriate CodeFile sections
+    for module in modules:
+        for code_file in module.get('hasPart', []):
+            if code_file.get('@type') == 'CodeFile':
+                file_name = code_file.get('name', '')
+                
+                # Try to match this file with runtime data
+                matching_runtime_data = None
+                
+                # Look for exact module name matches
+                for module_name, runtime_data in module_runtime_map.items():
+                    # Convert module name to file path (e.g., "emoji.core" -> "core.py")
+                    if '.' in module_name:
+                        module_file = module_name.split('.')[-1] + '.py'
+                    else:
+                        module_file = module_name + '.py'
+                    
+                    if file_name == module_file:
+                        matching_runtime_data = runtime_data
+                        break
+                
+                # If we found matching runtime data, add it to the CodeFile
+                if matching_runtime_data:
+                    code_file['runtimeBehavior'] = matching_runtime_data
+                    
+                    # Also add a summary for quick reference
+                    summary = matching_runtime_data['summary']
+                    code_file['runtimeSummary'] = {
+                        '@type': 'RuntimeSummary',
+                        'functionsExecuted': len(set(summary['functions_tested'])),
+                        'classesInstantiated': len(set(summary['classes_tested'])),
+                        'functionsSkipped': len(set(summary['functions_skipped'])),
+                        'classesSkipped': len(set(summary['classes_skipped'])),
+                        'executionErrors': len(summary['errors']),
+                        'hasRuntimeData': True
+                    }
+                else:
+                    # Add empty runtime summary to indicate no runtime data available
+                    code_file['runtimeSummary'] = {
+                        '@type': 'RuntimeSummary',
+                        'hasRuntimeData': False,
+                        'reason': 'No runtime analysis performed for this file'
+                    }
+
+def convert_to_enhanced_jsonld(metadata, modules, package_name, runtime_behavior=None, package_path=None):
     metadata.setdefault('@context', [
         'https://schema.org',
-        {'analysis': 'https://pykage2dkg.org/analysis#', 'security': 'https://pykage2dkg.org/security#', 'types': 'https://pykage2dkg.org/types#'}
+        {'analysis': 'https://pykage2dkg.org/analysis#', 'security': 'https://pykage2dkg.org/security#', 'types': 'https://pykage2dkg.org/types#', 'runtime': 'https://pykage2dkg.org/runtime#'}
     ])
     metadata['@type'] = 'SoftwareSourceCode'
     metadata['name'] = package_name
     metadata['programmingLanguage'] = 'Python'
     metadata['hasPart'] = modules
+    
+    # Distribute runtime behavior to individual files
+    if runtime_behavior and package_path:
+        distribute_runtime_behavior_to_files(modules, runtime_behavior, package_path)
+    
     summary = extract_analysis_summary(modules)
     metadata['analysisMetadata'] = {
         '@type': 'AnalysisMetadata',
@@ -45,4 +152,14 @@ def convert_to_enhanced_jsonld(metadata, modules, package_name):
         'typeSummary': summary['types'],
         'crossLanguageSupport': summary['crossLanguageSupport']
     }
+    
+    # Add overall runtime summary if runtime behavior was provided
+    if runtime_behavior:
+        metadata['runtimeAnalysisMetadata'] = {
+            '@type': 'RuntimeAnalysisMetadata',
+            'tool': runtime_behavior.get('@type', 'Unknown'),
+            'distributedToFiles': True,
+            'analysisApproach': 'smart_introspection_with_noworkflow' if runtime_behavior.get('smart_analysis') and runtime_behavior.get('noworkflow_analysis') else 'smart_introspection_only'
+        }
+    
     return metadata

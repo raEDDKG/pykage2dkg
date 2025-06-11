@@ -20,8 +20,10 @@ try:
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import BatchSpanProcessor
     OPENTELEMETRY_AVAILABLE = True
-except ImportError:
+except (ImportError, TypeError) as e:
+    # Handle both ImportError and TypeError (from typing_extensions conflicts)
     OPENTELEMETRY_AVAILABLE = False
+    print(f"Warning: OpenTelemetry not available: {e}")
 
 try:
     import prov.model as prov
@@ -625,25 +627,42 @@ with tracer.start_as_current_span("script_execution"):
             print(f"Cleanup failed: {e}")
 
 def extract_runtime_behavior(package_path: str, test_scripts: List[str] = None) -> Dict[str, Any]:
-    """Main function to extract runtime behavior using noWorkflow"""
+    """Main function to extract runtime behavior using smart test generation"""
     
     try:
-        # Try to use noWorkflow integration
-        from .noworkflow_integration import integrate_noworkflow_runtime
-        return integrate_noworkflow_runtime(package_path)
+        # Try to use smart runtime behavior extractor first
+        from .smart_runtime_extractor import extract_smart_runtime_behavior
+        smart_results = extract_smart_runtime_behavior(package_path, test_scripts)
+        
+        # Try to also get noWorkflow data if available
+        try:
+            from .noworkflow_integration import integrate_noworkflow_runtime
+            noworkflow_results = integrate_noworkflow_runtime(package_path)
+            
+            # Combine both results
+            return {
+                "@type": "CombinedRuntimeBehavior",
+                "smart_analysis": smart_results,
+                "noworkflow_analysis": noworkflow_results,
+                "primary_tool": "smart_introspection"
+            }
+        except ImportError:
+            # Return just smart results if noWorkflow not available
+            return smart_results
+            
     except ImportError:
-        # Fallback to basic extraction
+        # Fallback to basic extraction if smart extractor fails
         extractor = RuntimeBehaviorExtractor()
         try:
             return extractor.extract_runtime_behavior(package_path, test_scripts)
         finally:
             extractor.cleanup()
     except Exception as e:
-        # If noWorkflow fails, return basic structure with error
+        # If everything fails, return basic structure with error
         return {
             "@type": "RuntimeBehavior",
-            "tool": "noWorkflow",
-            "error": f"noWorkflow analysis failed: {str(e)}",
+            "tool": "fallback",
+            "error": f"Runtime analysis failed: {str(e)}",
             "fallback": "basic_analysis",
             "executions": []
         }
