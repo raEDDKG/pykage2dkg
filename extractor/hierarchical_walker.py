@@ -9,7 +9,7 @@ except ImportError:
 from .dossier_extractor import DossierExtractor
 from .codebert_summarizer import summarize_code
 from .codebert_embedder import embed_code
-from .runtime_extractor import extract_runtime_behavior
+#from .runtime_extractor import extract_runtime_behavior
 
 def build_enhanced_codefile(rel_path, code, base_path):
     extractor = EnhancedFunctionExtractor()
@@ -50,21 +50,26 @@ def walk_python_modules_enhanced(base_path):
                     build_enhanced_codefile(rel, src, base_path)
                 )
     
-    # Extract runtime behavior for the entire package
-    print("🔄 extracting runtime behavior and provenance...")
-    try:
-        runtime_behavior = extract_runtime_behavior(base_path)
-    except Exception as e:
-        print(f"⚠️ Runtime behavior extraction failed: {e}")
-        runtime_behavior = {"@type": "RuntimeBehavior", "error": str(e)}
+    # # Extract runtime behavior for the entire package
+    # print("🔄 extracting runtime behavior and provenance...")
+    # try:
+    #     runtime_behavior = extract_runtime_behavior(base_path)
+    # except Exception as e:
+    #     print(f"⚠️ Runtime behavior extraction failed: {e}")
+    #     runtime_behavior = {"@type": "RuntimeBehavior", "error": str(e)}
     
+    # result = [
+    #     {"@type": "CodeModule", "name": mod if mod!='.' else '', "hasPart": cps}
+    #     for mod, cps in modules.items()
+    # ]
+    
+    # # Add runtime behavior to the result
+    # if result:
+    #     result[0]["runtimeBehavior"] = runtime_behavior
+    
+    # return result
     result = [
         {"@type": "CodeModule", "name": mod if mod!='.' else '', "hasPart": cps}
         for mod, cps in modules.items()
     ]
-    
-    # Add runtime behavior to the result
-    if result:
-        result[0]["runtimeBehavior"] = runtime_behavior
-    
     return result
