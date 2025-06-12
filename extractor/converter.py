@@ -1,6 +1,9 @@
 from datetime import datetime
 import os
 from typing import Dict, List, Any, Optional
+from .runtime_semantics import analyze_runtime_semantics, enhance_runtime_data_with_semantics
+from .usage_mapper import enhance_with_usage_mapping
+from .import_validator import enhance_with_import_validation
 
 def extract_analysis_summary(modules):
     tools_used = set()
@@ -108,11 +111,13 @@ def distribute_runtime_behavior_to_files(modules: List[Dict[str, Any]], runtime_
                 
                 # If we found matching runtime data, add it to the CodeFile
                 if matching_runtime_data:
-                    code_file['runtimeBehavior'] = matching_runtime_data
+                    # Enhance runtime data with semantic analysis
+                    enhanced_runtime_data = enhance_runtime_data_with_semantics(matching_runtime_data)
+                    code_file['runtimeBehavior'] = enhanced_runtime_data
                     
                     # Also add a summary for quick reference
                     summary = matching_runtime_data['summary']
-                    code_file['runtimeSummary'] = {
+                    runtime_summary = {
                         '@type': 'RuntimeSummary',
                         'functionsExecuted': len(set(summary['functions_tested'])),
                         'classesInstantiated': len(set(summary['classes_tested'])),
@@ -121,18 +126,35 @@ def distribute_runtime_behavior_to_files(modules: List[Dict[str, Any]], runtime_
                         'executionErrors': len(summary['errors']),
                         'hasRuntimeData': True
                     }
+                    
+                    # Add semantic analysis to the runtime summary
+                    runtime_semantics = analyze_runtime_semantics(runtime_summary)
+                    runtime_summary['semantics'] = runtime_semantics
+                    
+                    code_file['runtimeSummary'] = runtime_summary
                 else:
                     # Add empty runtime summary to indicate no runtime data available
-                    code_file['runtimeSummary'] = {
+                    empty_runtime_summary = {
                         '@type': 'RuntimeSummary',
                         'hasRuntimeData': False,
-                        'reason': 'No runtime analysis performed for this file'
+                        'reason': 'No runtime analysis performed for this file',
+                        'functionsExecuted': 0,
+                        'classesInstantiated': 0,
+                        'functionsSkipped': 0,
+                        'classesSkipped': 0,
+                        'executionErrors': 0
                     }
+                    
+                    # Add semantic analysis even for empty runtime data
+                    runtime_semantics = analyze_runtime_semantics(empty_runtime_summary)
+                    empty_runtime_summary['semantics'] = runtime_semantics
+                    
+                    code_file['runtimeSummary'] = empty_runtime_summary
 
 def convert_to_enhanced_jsonld(metadata, modules, package_name, runtime_behavior=None, package_path=None):
     metadata.setdefault('@context', [
         'https://schema.org',
-        {'analysis': 'https://pykage2dkg.org/analysis#', 'security': 'https://pykage2dkg.org/security#', 'types': 'https://pykage2dkg.org/types#', 'runtime': 'https://pykage2dkg.org/runtime#'}
+        {'analysis': 'https://pykage2dkg.org/analysis#', 'security': 'https://pykage2dkg.org/security#', 'types': 'https://pykage2dkg.org/types#', 'runtime': 'https://pykage2dkg.org/runtime#', 'semantics': 'https://pykage2dkg.org/semantics#'}
     ])
     metadata['@type'] = 'SoftwareSourceCode'
     metadata['name'] = package_name
@@ -159,7 +181,16 @@ def convert_to_enhanced_jsonld(metadata, modules, package_name, runtime_behavior
             '@type': 'RuntimeAnalysisMetadata',
             'tool': runtime_behavior.get('@type', 'Unknown'),
             'distributedToFiles': True,
-            'analysisApproach': 'smart_introspection_with_noworkflow' if runtime_behavior.get('smart_analysis') and runtime_behavior.get('noworkflow_analysis') else 'smart_introspection_only'
+            'analysisApproach': 'smart_introspection_with_noworkflow' if runtime_behavior.get('smart_analysis') and runtime_behavior.get('noworkflow_analysis') else 'smart_introspection_only',
+            'semanticAnalysis': True,
+            'semanticTool': 'codebert_runtime_semantics',
+            'enhancedWithEmbeddings': True
         }
+    
+    # Add AI Agent guidance for DKG usage
+    if package_path:
+        metadata = enhance_with_usage_mapping(metadata, package_path, package_name)
+        # Add real import validation
+        metadata = enhance_with_import_validation(metadata, package_path, package_name)
     
     return metadata

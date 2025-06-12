@@ -96,7 +96,8 @@ class SmartRuntimeBehaviorExtractor:
             dirs[:] = [d for d in dirs if not d.startswith('__pycache__')]
             
             for file in files:
-                if file.endswith('.py') and not file.startswith('__'):
+                if file.endswith('.py') and file != '__pycache__':
+                    # Include __init__.py files as they often contain important code
                     module_path = os.path.join(root, file)
                     python_modules.append(module_path)
         
