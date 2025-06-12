@@ -263,12 +263,26 @@ class TemporaryEcosystemAnalyzer:
         return paths
     
     def _analyze_package_imports(self, package_path: str, package_name: str, python_path: str) -> Dict[str, Any]:
-        """Analyze imports for a single package"""
+        """Analyze imports for a single package using enhanced validator"""
         try:
-            # Simple analysis without import validator for now
-            # TODO: Integrate import validator properly
+            # Import the enhanced validator
+            import sys
+            import os
             
-            # Basic file structure analysis
+            # Add the current directory to Python path to import our modules
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            if current_dir not in sys.path:
+                sys.path.insert(0, current_dir)
+            
+            from extractor.enhanced_import_validator import EnhancedImportValidator
+            
+            # Use the enhanced validator that works in virtual environments
+            validator = EnhancedImportValidator(python_path)
+            validation_results = validator.validate_package_imports_in_venv(
+                package_path, package_name, python_path
+            )
+            
+            # Count Python files for additional context
             python_files = []
             if os.path.isdir(package_path):
                 for root, dirs, files in os.walk(package_path):
@@ -277,15 +291,7 @@ class TemporaryEcosystemAnalyzer:
                             python_files.append(os.path.join(root, file))
             
             return {
-                "importValidation": {
-                    "validatedImports": {},
-                    "failedImports": {},
-                    "availableExports": [],
-                    "aiAgentGuidance": {
-                        "safeImports": [],
-                        "unsafeImports": []
-                    }
-                },
+                "importValidation": validation_results,
                 "fileCount": len(python_files),
                 "status": "success"
             }

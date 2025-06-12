@@ -85,34 +85,55 @@ class ImportValidator:
         return modules
     
     def _get_module_name(self, module_path: str, package_name: str) -> str:
-        """Convert file path to module name"""
-        # Get relative path from package
-        if package_name in sys.modules:
-            package_file = sys.modules[package_name].__file__
-            if package_file:
-                package_dir = os.path.dirname(package_file)
-                try:
-                    rel_path = os.path.relpath(module_path, package_dir)
-                    if rel_path.endswith('__init__.py'):
-                        # Handle __init__.py files
-                        dir_parts = os.path.dirname(rel_path).split(os.sep)
-                        if dir_parts == ['']:
-                            return package_name
-                        else:
-                            return f"{package_name}.{'.'.join(dir_parts)}"
-                    else:
-                        # Handle regular .py files
-                        module_parts = rel_path.replace('.py', '').split(os.sep)
+        """Convert file path to module name - FIXED VERSION"""
+        try:
+            # Normalize the path
+            module_path = os.path.normpath(module_path)
+            
+            # Find the package root by looking for the package name in the path
+            path_parts = module_path.split(os.sep)
+            
+            # Find where the package name appears in the path
+            package_index = -1
+            for i, part in enumerate(path_parts):
+                if part == package_name or part == package_name.replace('-', '_'):
+                    package_index = i
+                    break
+            
+            if package_index >= 0:
+                # Get the relative path from the package root
+                relative_parts = path_parts[package_index:]
+                
+                # Handle __init__.py files
+                if relative_parts[-1] == '__init__.py':
+                    if len(relative_parts) == 2:  # package/__init__.py
+                        return package_name
+                    else:  # package/submodule/__init__.py
+                        module_parts = relative_parts[1:-1]  # Skip package name and __init__.py
                         return f"{package_name}.{'.'.join(module_parts)}"
-                except ValueError:
-                    pass
-        
-        # Fallback: guess from filename
-        filename = os.path.basename(module_path)
-        if filename == '__init__.py':
-            return package_name
-        else:
-            return f"{package_name}.{filename.replace('.py', '')}"
+                else:
+                    # Handle regular .py files
+                    filename = relative_parts[-1].replace('.py', '')
+                    if len(relative_parts) == 2:  # package/module.py
+                        return f"{package_name}.{filename}"
+                    else:  # package/subpackage/module.py
+                        module_parts = relative_parts[1:-1] + [filename]
+                        return f"{package_name}.{'.'.join(module_parts)}"
+            
+            # Fallback: guess from filename
+            filename = os.path.basename(module_path)
+            if filename == '__init__.py':
+                return package_name
+            else:
+                return f"{package_name}.{filename.replace('.py', '')}"
+                
+        except Exception as e:
+            # Ultimate fallback
+            filename = os.path.basename(module_path)
+            if filename == '__init__.py':
+                return package_name
+            else:
+                return f"{package_name}.{filename.replace('.py', '')}"
     
     def _validate_module_import(self, module_name: str) -> Dict[str, Any]:
         """Test if a module can actually be imported"""

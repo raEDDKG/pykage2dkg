@@ -10,9 +10,19 @@ class DossierExtractor:
         self.supported_languages = ['python', 'javascript', 'typescript', 'rust', 'go']
     
     def extract_documentation(self, project_path: str, language: str = 'python') -> Dict[str, Any]:
-        """Extract documentation using Dossier"""
+        """Extract documentation using Dossier (optional tool)"""
         if language not in self.supported_languages:
             return {"error": f"Language {language} not supported by Dossier"}
+        
+        # Check if dossier is available
+        try:
+            subprocess.run(['dossier', '--version'], capture_output=True, check=True)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return {
+                "status": "skipped",
+                "reason": "Dossier tool not available - this is optional",
+                "fallback": "Using basic documentation extraction"
+            }
         
         try:
             with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp_file:
