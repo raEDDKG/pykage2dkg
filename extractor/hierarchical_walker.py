@@ -13,7 +13,11 @@ from .codebert_embedder import embed_code
 
 def build_enhanced_codefile(rel_path, code, base_path):
     extractor = EnhancedFunctionExtractor()
-    enhanced = extractor.extract_enhanced(code, os.path.join(base_path, rel_path))
+    enhanced = extractor.extract_enhanced(
+        code, 
+        file_path=os.path.join(base_path, rel_path),
+        package_root=base_path  # Pass package root for proper analysis
+    )
     classes = enhanced['ast']['classes']
     top_level = enhanced['ast']['functions']
     for cls in classes:

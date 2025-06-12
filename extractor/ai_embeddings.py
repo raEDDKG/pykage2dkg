@@ -22,7 +22,7 @@ import warnings
 class AIEmbeddingGenerator:
     """Generate AI-compatible embeddings with multiple format support"""
     
-    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "microsoft/codebert-base"):
         self.model_name = model_name
         self.embedder = None
         self.embedding_dim = None
@@ -37,10 +37,12 @@ class AIEmbeddingGenerator:
             return "sentence-transformers"
         elif model_name.startswith("openai/"):
             return "openai"
+        elif model_name.startswith("microsoft/codebert") or model_name.startswith("microsoft/unixcoder"):
+            return "codebert"
         elif model_name.startswith("huggingface/"):
             return "huggingface"
         else:
-            return "sentence-transformers"  # Default
+            return "codebert"  # Default to code-focused
     
     def _initialize_embedder(self):
         """Initialize the appropriate embedding model"""
@@ -49,6 +51,8 @@ class AIEmbeddingGenerator:
                 self._init_sentence_transformers()
             elif self.model_type == "openai":
                 self._init_openai()
+            elif self.model_type == "codebert":
+                self._init_codebert()
             elif self.model_type == "huggingface":
                 self._init_huggingface()
         except Exception as e:
@@ -82,6 +86,27 @@ class AIEmbeddingGenerator:
             print("⚠️ openai not available. Install with: pip install openai")
             raise
     
+    def _init_codebert(self):
+        """Initialize CodeBERT model for code embeddings"""
+        try:
+            from transformers import AutoTokenizer, AutoModel
+            import torch
+            
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            self.embedder = AutoModel.from_pretrained(self.model_name)
+            
+            # Get embedding dimension
+            test_input = self.tokenizer("def test(): pass", return_tensors="pt", max_length=512, truncation=True, padding=True)
+            with torch.no_grad():
+                test_output = self.embedder(**test_input)
+                self.embedding_dim = test_output.last_hidden_state.shape[-1]
+            
+            print(f"✅ Loaded CodeBERT model: {self.model_name} (dim: {self.embedding_dim})")
+            
+        except ImportError:
+            print("⚠️ transformers not available. Install with: pip install transformers torch")
+            raise
+    
     def _init_huggingface(self):
         """Initialize Hugging Face transformers model"""
         try:
@@ -110,8 +135,13 @@ class AIEmbeddingGenerator:
             return self._create_fallback_response(texts, formats)
         
         try:
-            # Generate base embeddings
-            embeddings = self.embedder.encode(texts)
+            # Generate base embeddings based on model type
+            if self.model_type == "sentence-transformers":
+                embeddings = self.embedder.encode(texts)
+            elif self.model_type == "codebert":
+                embeddings = self._generate_codebert_embeddings(texts)
+            else:
+                raise NotImplementedError(f"Embedding generation not implemented for {self.model_type}")
             
             # Convert to requested formats
             result = {
@@ -128,6 +158,32 @@ class AIEmbeddingGenerator:
             print(f"⚠️ Embedding generation failed: {e}")
             return self._create_fallback_response(texts, formats)
     
+    def _generate_codebert_embeddings(self, texts: List[str]) -> np.ndarray:
+        """Generate embeddings using CodeBERT model"""
+        import torch
+        import numpy as np
+        
+        embeddings = []
+        
+        for text in texts:
+            # Tokenize the text
+            inputs = self.tokenizer(
+                text,
+                return_tensors="pt",
+                max_length=512,
+                truncation=True,
+                padding=True
+            )
+            
+            # Generate embeddings
+            with torch.no_grad():
+                outputs = self.embedder(**inputs)
+                # Use mean pooling of last hidden state
+                embedding = outputs.last_hidden_state.mean(dim=1).squeeze().cpu().numpy()
+                embeddings.append(embedding)
+        
+        return np.array(embeddings)
+    
     def _convert_to_format(self, embeddings: np.ndarray, format_type: str) -> Any:
         """Convert embeddings to specific format"""
         
@@ -142,6 +198,10 @@ class AIEmbeddingGenerator:
         
         elif format_type == "openai":
             # OpenAI format (list of lists)
+            return embeddings.tolist()
+        
+        elif format_type == "codebert":
+            # CodeBERT format (same as list but with metadata indicating code focus)
             return embeddings.tolist()
         
         elif format_type == "huggingface":
@@ -169,6 +229,7 @@ class AIEmbeddingGenerator:
                 "dataType": str(embeddings.dtype)
             },
             "aiCompatibility": {
+                "codebert": True,
                 "sentenceTransformers": True,
                 "openai": True,
                 "huggingface": True,
@@ -176,6 +237,8 @@ class AIEmbeddingGenerator:
                 "frameworks": ["langchain", "llamaindex", "haystack"]
             },
             "usage": {
+                "codeSemanticSearch": True,
+                "codeSimilarity": True,
                 "semanticSearch": True,
                 "clustering": True,
                 "classification": True,
@@ -257,8 +320,8 @@ class AIEmbeddingGenerator:
         }
 
 def enhance_jsonld_with_ai_embeddings(jsonld: Dict[str, Any], 
-                                    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
-                                    formats: List[str] = ["sentence-transformers"]) -> Dict[str, Any]:
+                                    embedding_model: str = "microsoft/codebert-base",
+                                    formats: List[str] = ["codebert"]) -> Dict[str, Any]:
     """
     Enhance JSON-LD with AI-compatible embeddings
     

@@ -1,19 +1,21 @@
 try:
     from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
     
-    # Use a public summarization model
-    MODEL_ID = "Salesforce/codet5-base-multi-sum"
+    # Best code-focused summarization model - CodeT5+ for better code understanding
+    # Alternative: "Salesforce/codet5p-220m-py" for Python-specific summarization
+    SUMMARY_MODEL_ID = "Salesforce/codet5p-220m"
     
     try:
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-        model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID)
+        tokenizer = AutoTokenizer.from_pretrained(SUMMARY_MODEL_ID)
+        model = AutoModelForSeq2SeqLM.from_pretrained(SUMMARY_MODEL_ID)
         TRANSFORMERS_AVAILABLE = True
+        print(f"✅ Loaded code summarization model: {SUMMARY_MODEL_ID}")
     except Exception as e:
-        print(f"Warning: Could not load transformers model: {e}")
+        print(f"Warning: Could not load code summarization model {SUMMARY_MODEL_ID}: {e}")
         TRANSFORMERS_AVAILABLE = False
         
 except ImportError:
-    print("Warning: transformers not available, using fallback summarizer")
+    print("Warning: transformers not available, using fallback code summarizer")
     TRANSFORMERS_AVAILABLE = False
 
 def summarize_code(code: str) -> str:

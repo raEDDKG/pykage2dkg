@@ -220,8 +220,20 @@ def extract_with_libcst(source_code: str) -> Dict[str, Any]:
             "classes": extractor.classes,
             "imports": extractor.imports,
             "packages": extractor.packages,
-            "typeAnnotations": extractor.type_annotations
+            "typeAnnotations": extractor.type_annotations,
+            "extractionStatus": "success"
+        }
+    except cst.ParserError as e:
+        print(f"LibCST parser error: {e}")
+        return {
+            "functions": [], "classes": [], "imports": [], "packages": [], 
+            "typeAnnotations": {}, "parseError": str(e), "errorType": "syntax",
+            "extractionStatus": "partial"
         }
     except Exception as e:
         print(f"LibCST extraction failed: {e}")
-        return {"functions": [], "classes": [], "imports": [], "packages": [], "typeAnnotations": {}}
+        return {
+            "functions": [], "classes": [], "imports": [], "packages": [], 
+            "typeAnnotations": {}, "parseError": str(e), "errorType": "unknown",
+            "extractionStatus": "failed"
+        }

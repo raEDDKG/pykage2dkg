@@ -47,7 +47,7 @@ class EnhancedEcosystemAnalyzer:
     
     def __init__(self, use_uv: bool = False, embedding_model: Optional[str] = None):
         self.use_uv = use_uv
-        self.embedding_model = embedding_model or "sentence-transformers/all-MiniLM-L6-v2"
+        self.embedding_model = embedding_model or "microsoft/codebert-base"
         self.temp_dir = None
         self.venv_path = None
         self.ecosystem_output_dir = Path("output_ecosystem")
@@ -61,16 +61,17 @@ class EnhancedEcosystemAnalyzer:
         self.embedder = self._initialize_embedder()
     
     def _initialize_embedder(self) -> Optional[Any]:
-        """Initialize sentence-transformers embedder if available"""
+        """Initialize code-focused embedder if available"""
         try:
-            from sentence_transformers import SentenceTransformer
-            print(f"🤖 Initializing embedding model: {self.embedding_model}")
-            return SentenceTransformer(self.embedding_model)
-        except ImportError:
-            print("⚠️ sentence-transformers not available, using fallback embeddings")
+            # Try to use our AI embeddings module with CodeBERT
+            from extractor.ai_embeddings import AIEmbeddingGenerator
+            print(f"🤖 Initializing code embedding model: {self.embedding_model}")
+            return AIEmbeddingGenerator(self.embedding_model)
+        except ImportError as e:
+            print(f"⚠️ AI embeddings module not available: {e}")
             return None
         except Exception as e:
-            print(f"⚠️ Failed to load embedding model {self.embedding_model}: {e}")
+            print(f"⚠️ Failed to load code embedding model {self.embedding_model}: {e}")
             return None
     
     def analyze_package_focused(self, source: str, package_name: str, 
@@ -473,7 +474,7 @@ class EnhancedEcosystemAnalyzer:
         """Add AI-optimized embeddings using the enhanced embedding module"""
         
         # Use the enhanced AI embeddings module
-        embedding_formats = ["sentence-transformers", "list"]  # Multiple formats for compatibility
+        embedding_formats = ["codebert", "list"]  # Multiple formats for compatibility
         
         try:
             enhanced_jsonld = enhance_jsonld_with_ai_embeddings(
@@ -592,8 +593,8 @@ def main():
     )
     parser.add_argument(
         "--embedding-model",
-        default="sentence-transformers/all-MiniLM-L6-v2",
-        help="Sentence-transformers model for AI-compatible embeddings"
+        default="microsoft/codebert-base",
+        help="Code-focused embedding model for AI-compatible embeddings"
     )
     
     args = parser.parse_args()
