@@ -1,0 +1,23 @@
+{
+  "@context": [
+    "https://schema.org"
+  ],
+  "@type": "AIOptimizedEcosystem",
+  "primaryPackage": "emoji",
+  "analysisTimestamp": "20250612T144704Z",
+  "analysisApproach": "ai_agent_focused",
+  "embeddingModel": "microsoft/codebert-base",
+  "sourceType": "install",
+  "primaryPackageAnalysis": {
+    "status": "success",
+    "deepAnalysis": true,
+    "file": "emoji_ai_optimized_20250612T144704Z.jsonld"
+  },
+  "dependencies": {},
+  "aiAgentGuidance": {
+    "@type": "AIAgentEcosystemGuidance",
+    "focus": "Primary package has complete deep analysis, dependencies have import validation only",
+    "recommendation": "Use primary package analysis for detailed code understanding",
+    "embeddingCompatibility": "sentence-transformers format for universal AI agent compatibility"
+  }
+}
