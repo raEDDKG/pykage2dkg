@@ -46,8 +46,8 @@ class EnhancedEcosystemAnalyzer:
     """AI Agent optimized ecosystem analyzer"""
     
     def __init__(self, use_uv: bool = False, embedding_model: Optional[str] = None):
-        self.use_uv = use_uv
-        self.embedding_model = embedding_model or "microsoft/codebert-base"
+        self.use_uv = use_uv                        # microsoft/codebert-base too slow
+        self.embedding_model = embedding_model or "neulab/codebert-python"
         self.temp_dir = None
         self.venv_path = None
         self.ecosystem_output_dir = Path("output_ecosystem")
@@ -593,7 +593,8 @@ def main():
     )
     parser.add_argument(
         "--embedding-model",
-        default="microsoft/codebert-base",
+        # microsoft/codebert-base too slow
+        default="neulab/codebert-python",
         help="Code-focused embedding model for AI-compatible embeddings"
     )
     

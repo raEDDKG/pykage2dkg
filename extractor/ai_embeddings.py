@@ -21,8 +21,8 @@ import warnings
 
 class AIEmbeddingGenerator:
     """Generate AI-compatible embeddings with multiple format support"""
-    
-    def __init__(self, model_name: str = "microsoft/codebert-base"):
+    # used microsoft/codebert-base before, but it was too slow
+    def __init__(self, model_name: str = "neulab/codebert-python"):
         self.model_name = model_name
         self.embedder = None
         self.embedding_dim = None

@@ -4,9 +4,9 @@ try:
     # Try multiple models in order of preference
     MODEL_OPTIONS = [
         "Salesforce/codet5-base-multi-sum", # Best model
-        "microsoft/CodeT5-small",  # Smaller, more stable model
-        "Salesforce/codet5p-220m",  # Original choice
-        "microsoft/codebert-base"   # Fallback option
+        #"microsoft/CodeT5-small",  # Smaller, more stable model
+        #"Salesforce/codet5p-220m",  # Original choice
+        #"microsoft/codebert-base"   # Fallback option
     ]
     
     TRANSFORMERS_AVAILABLE = False
@@ -52,21 +52,45 @@ def summarize_code(code: str) -> str:
         # Remove the problematic "summarize:" prefix that causes recursion
         prompt = f"# Code Summary\n{code}\n\n# What this code does:"
         
-        inputs = tokenizer.encode(prompt,
-                                  return_tensors="pt",
-                                  truncation=True,
-                                  max_length=400)  # Reduced to leave room for output
+        # inputs = tokenizer.encode(prompt,
+        #                           return_tensors="pt",
+        #                           truncation=True,
+        #                           max_length=400)  # Reduced to leave room for output
         
+        # summary_ids = model.generate(
+        #     inputs,
+        #     max_length=150,  # Increased for more complete summaries
+        #     min_length=10,
+        #     length_penalty=1.5,  # Reduced to allow longer summaries
+        #     num_beams=3,  # Reduced for faster generation
+        #     early_stopping=True,
+        #     do_sample=False,  # Disable sampling for more deterministic output
+        #     temperature=0.7,
+        #     pad_token_id=tokenizer.eos_token_id
+        # )
+        # Tokenize with attention mask
+        inputs = tokenizer(prompt,
+                        return_tensors="pt",
+                        truncation=True,
+                        max_length=400,
+                        padding=True,
+                        return_attention_mask=True)
+
+        # Set pad token if not set
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+
         summary_ids = model.generate(
-            inputs,
-            max_length=150,  # Increased for more complete summaries
+            inputs.input_ids,
+            attention_mask=inputs.attention_mask,
+            max_length=150,
             min_length=10,
-            length_penalty=1.5,  # Reduced to allow longer summaries
-            num_beams=3,  # Reduced for faster generation
+            length_penalty=1.5,
+            num_beams=3,
             early_stopping=True,
-            do_sample=False,  # Disable sampling for more deterministic output
-            temperature=0.7,
-            pad_token_id=tokenizer.eos_token_id
+            do_sample=False,  # Keep deterministic
+            pad_token_id=tokenizer.pad_token_id
+            # Removed temperature since do_sample=False
         )
         
         summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
