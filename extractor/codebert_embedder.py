@@ -4,7 +4,10 @@ try:
     
     # Best code-focused embedding model - Microsoft's CodeBERT
     # Alternative: "microsoft/unixcoder-base" for even better code understanding
-    EMBED_MODEL_ID = "microsoft/codebert-base"
+    # Best I found for python: "neulab/codebert-python"
+    # Tried this one (took too long): "microsoft/codebert-base" 
+    # Need to try a python specific one: "microsoft/CodeBERT-python"
+    EMBED_MODEL_ID = "neulab/codebert-python"
     
     try:
         tokenizer_embed = AutoTokenizer.from_pretrained(EMBED_MODEL_ID)

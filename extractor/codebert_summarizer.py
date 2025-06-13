@@ -3,6 +3,7 @@ try:
     
     # Try multiple models in order of preference
     MODEL_OPTIONS = [
+        "Salesforce/codet5-base-multi-sum", # Best model
         "microsoft/CodeT5-small",  # Smaller, more stable model
         "Salesforce/codet5p-220m",  # Original choice
         "microsoft/codebert-base"   # Fallback option
